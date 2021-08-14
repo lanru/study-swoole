@@ -1,9 +1,18 @@
 #include "study_coroutine.h"
-#include <iostream>
+#include "./include/coroutine.h"
 
 using Study::PHPCoroutine;
 using Study::Coroutine;
 using namespace std;
+
+php_coro_task PHPCoroutine::main_task = {0};
+
+void PHPCoroutine::init()
+{
+    Coroutine::set_on_yield(on_yield);
+    Coroutine::set_on_resume(on_resume);
+    Coroutine::set_on_close(on_close);
+}
 
 long PHPCoroutine::create(zend_fcall_info_cache *fci_cache, uint32_t argc, zval *argv) {
     php_coro_args php_coro_args;
@@ -26,7 +35,6 @@ void PHPCoroutine::save_vm_stack(php_coro_task *task) {
     task->execute_data = EG(current_execute_data);
 }
 
-php_coro_task PHPCoroutine::main_task = {0};
 
 php_coro_task *PHPCoroutine::get_task() {
     //我们让Coroutine::get_current_task()返回一个void类型的指针，然后，根据我们上层需要的协程结构进行转换即可，这样我们的协程库就可以在多个地方使用了。所以，我们需要去实现Study::Coroutine::get_current_task
@@ -161,6 +169,53 @@ void PHPCoroutine::defer(php_study_fci_fcc *defer_fci_fcc) {
         task->defer_tasks = new std::stack<php_study_fci_fcc *>;
     }
     task->defer_tasks->push(defer_fci_fcc);
+}
+
+
+void PHPCoroutine::on_yield(void *arg)
+{
+    php_coro_task *task = (php_coro_task *) arg;
+    php_coro_task *origin_task = get_origin_task(task);
+    save_task(task);
+    restore_task(origin_task);
+}
+
+void PHPCoroutine::on_resume(void *arg)
+{
+    php_coro_task *task = (php_coro_task *) arg;
+    php_coro_task *current_task = get_task();
+    save_task(current_task);
+    restore_task(task);
+}
+
+// todo  恢复php的执行栈，此处非常重要，否则会报错:Assertion failed: ((executor_globals.vm_stack_top) > (zval *) (executor_globals.vm_stack) && (executor_globals.vm_stack_end) > (zval *) (executor_globals.vm_stack) && (executor_globals.vm_stack_top) <= (executor_globals.vm_stack_end)), function zend_vm_stack_free_call_frame_ex, file Zend/zend_execute.h, line 289.
+void PHPCoroutine::on_close(void *arg)
+{
+    php_coro_task *task = (php_coro_task *) arg;
+    php_coro_task *origin_task = get_origin_task(task);
+    zend_vm_stack stack = EG(vm_stack);
+    efree(stack);
+    restore_task(origin_task);
+}
+
+/**
+ * load PHP stack
+ */
+void PHPCoroutine::restore_task(php_coro_task *task)
+{
+    restore_vm_stack(task);
+}
+
+/**
+ * load PHP stack
+ */
+inline void PHPCoroutine::restore_vm_stack(php_coro_task *task)
+{
+    EG(vm_stack_top) = task->vm_stack_top;
+    EG(vm_stack_end) = task->vm_stack_end;
+    EG(vm_stack) = task->vm_stack;
+    EG(vm_stack_page_size) = task->vm_stack_page_size;
+    EG(current_execute_data) = task->execute_data;
 }
 
 
