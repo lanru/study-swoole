@@ -1,6 +1,5 @@
 #include "study_coroutine.h"
 #include <unordered_map>
-
 using Study::PHPCoroutine;
 using Study::Coroutine;
 
