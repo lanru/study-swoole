@@ -3,6 +3,7 @@
 
 #include "context.h"
 #include <unordered_map>
+#include "uv.h" //mac或者linxu中的/usr/local/include/uv.h
 
 #define DEFAULT_C_STACK_SIZE (2 * 1024 * 1024)
 
@@ -22,7 +23,6 @@ namespace Study
         void set_task(void *_task);
         void yield();
         void resume();
-        static int sleep(double seconds);
         static void set_on_yield(st_coro_on_swap_t func);
         static void set_on_resume(st_coro_on_swap_t func);
         static void set_on_close(st_coro_on_swap_t func);
@@ -42,6 +42,7 @@ namespace Study
         {
             return origin;
         }
+        static int sleep(double seconds);
 
     protected:
         Coroutine *origin;
