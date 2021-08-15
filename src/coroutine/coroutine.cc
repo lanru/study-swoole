@@ -65,6 +65,7 @@ void Coroutine::set_on_close(st_coro_on_swap_t func) {
 }
 
 static void sleep_timeout(uv_timer_t *timer) {
+    //这个函数的作用就是去resume当前协程，于是就起到了唤醒当前协程的效果
     ((Coroutine *) timer->data)->resume();
 }
 

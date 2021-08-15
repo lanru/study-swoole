@@ -239,9 +239,41 @@ int PHPCoroutine::sleep(double seconds)
     return 0;
 }
 
+typedef enum {
+    UV_CLOCK_PRECISE = 0,  /* Use the highest resolution clock available. */
+    UV_CLOCK_FAST = 1      /* Use the fastest clock with <= 1ms granularity. */
+} uv_clocktype_t;
+
+//因为libuv在它src目录下面的头文件不会被安装在/usr/local/include这个目录项目，所以，如果我们不重复定义uv_clocktype_t以及extern这三个函数（uv__run_timers、uv__hrtime、uv__next_timeout），那么在编译的时候编译器就会说没有声明这些函数。这是我使用libuv比较头疼的一件事情
+extern "C" void uv__run_timers(uv_loop_t* loop);
+extern "C" uint64_t uv__hrtime(uv_clocktype_t type);
+extern "C" int uv__next_timeout(const uv_loop_t* loop);
+
 int PHPCoroutine::scheduler()
 {
-    while (1)
+    //用来获取到libuv这个库里面定义好的全局变量loop，我们可以通过这个变量来控制循环
+    uv_loop_t* loop = uv_default_loop();
+
+    //用来判断循环是否结束
+    while (loop->stop_flag == 0)
     {
+        loop->time = uv__hrtime(UV_CLOCK_FAST) / 1000000;
+        //修改当前的时间,这个函数会遍历整个定时器堆，让我们设置的每个定时器节点时间和loop->time进行比较，如果这个定时器节点的时间大于了这个loop->time，也就意味着定时器过期了，这个时候，就会去执行这个定时器节点的回调函数。而这个回调函数是我们自己设置的，我们可以回顾一下我们写好的Coroutine::sleep代码：
+        //
+        //uv_timer_start(&timer, sleep_timeout, seconds * 1000, 0);
+        //Copy to clipboardErrorCopied
+        //其中sleep_timeout就是我们的回调函数static void sleep_timeout(uv_timer_t *timer)
+        //{
+        //    ((Coroutine *) timer->data)->resume();
+        //}
+        uv__run_timers(loop);
+
+        //这段代码的作用是先执行uv__next_timeout来判断一下是否还有未执行的定时器，如果没有，那么会返回-1，然后执行uv_stop把loop->stop_flag设置为1，结束我们最外层的while循环
+        if (uv__next_timeout(loop) < 0)
+        {
+            uv_stop(loop);
+        }
     }
+
+    return 0;
 }
