@@ -1,5 +1,29 @@
 #include "php_study.h"
+// 新增加的内容
+#include <stdio.h>
+#include <iostream>
+#include <uv.h>
 
+using namespace std;
+
+uint64_t repeat = 0;
+
+static void callback(uv_timer_t *handle)
+{
+    repeat = repeat + 1;
+    cout << "repeat count:" << repeat << endl;
+}
+
+PHP_FUNCTION(study_timer_test)
+{
+    uv_loop_t *loop = uv_default_loop();
+    uv_timer_t timer_req;
+    uv_timer_init(loop, &timer_req);
+
+    uv_timer_start(&timer_req, callback, 1000, 1000);
+    uv_run(loop, UV_RUN_DEFAULT);
+}
+// 新增加的内容
 PHP_MINIT_FUNCTION(study)
 {
     // 协程类注册
@@ -41,6 +65,7 @@ const zend_function_entry study_functions[] = {
         PHP_FE(study_coroutine_create, arginfo_study_coroutine_create)
 //      PHP_FALIAS的作用就是用来取别名的，这里换成了我们需要的短名sgo
         PHP_FALIAS(sgo, study_coroutine_create, arginfo_study_coroutine_create)
+        PHP_FE(study_timer_test, NULL) // 新增加的一行
         PHP_FE_END
 };
 

@@ -5,6 +5,11 @@ Make sure that the comment is aligned:
 # AC_CANONICAL_HOST
 
 if test "$PHP_STUDY" != "no"; then
+########新增加的2行 用来添加链接库，并且指明我们的动态链接库的路径，增加了config.m4文件的这两行之后，会在./configure命令生成的Makefile里面得到体现
+    PHP_ADD_LIBRARY_WITH_PATH(uv, /usr/local/lib/, STUDY_SHARED_LIBADD)
+    PHP_SUBST(STUDY_SHARED_LIBADD)
+########新增加的2行
+
     PHP_ADD_LIBRARY(pthread)
     STUDY_ASM_DIR="thirdparty/boost/asm/"
     CFLAGS="-Wall -pthread $CFLAGS"
