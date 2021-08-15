@@ -1,6 +1,6 @@
 #include "study_coroutine.h"
 #include "./include/coroutine.h"
-
+#include<iostream>
 using Study::Coroutine;
 using Study::PHPCoroutine;
 using namespace std;
@@ -231,4 +231,10 @@ inline void PHPCoroutine::restore_vm_stack(php_coro_task *task)
     EG(vm_stack) = task->vm_stack;
     EG(vm_stack_page_size) = task->vm_stack_page_size;
     EG(current_execute_data) = task->execute_data;
+}
+
+int PHPCoroutine::sleep(double seconds)
+{
+    std::cout << seconds << endl;
+    return 0;
 }

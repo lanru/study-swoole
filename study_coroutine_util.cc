@@ -115,6 +115,27 @@ PHP_METHOD(study_coroutine_util, defer)
     PHPCoroutine::defer(defer_fci_fcc);
 }
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_study_coroutine_sleep, 0, 0, 1)
+                ZEND_ARG_INFO(0, seconds)
+ZEND_END_ARG_INFO()
+
+PHP_METHOD(study_coroutine_util, sleep)
+{
+    double seconds;
+
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+            Z_PARAM_DOUBLE(seconds)
+    ZEND_PARSE_PARAMETERS_END_EX(RETURN_FALSE);
+
+    if (UNEXPECTED(seconds < 0.001))
+    {
+        php_error_docref(NULL, E_WARNING, "Timer must be greater than or equal to 0.001");
+        RETURN_FALSE;
+    }
+
+    PHPCoroutine::sleep(seconds);
+    RETURN_TRUE;
+}
 
 /**
  * zend_function_entry
@@ -140,6 +161,7 @@ const zend_function_entry study_coroutine_util_methods[] =
                 PHP_ME(study_coroutine_util, getCid, arginfo_study_coroutine_void, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
                 PHP_ME(study_coroutine_util, isExist, arginfo_study_coroutine_isExist, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
                 PHP_ME(study_coroutine_util, defer, arginfo_study_coroutine_defer, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+                PHP_ME(study_coroutine_util, sleep, arginfo_study_coroutine_sleep, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
                 PHP_FE_END
         };
 

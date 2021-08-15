@@ -32,6 +32,7 @@ namespace Study {
     class PHPCoroutine {
     public:
         static void init();
+        static int sleep(double seconds);
 
         static long create(zend_fcall_info_cache *fci_cache, uint32_t argc, zval *argv);
 
