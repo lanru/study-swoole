@@ -16,7 +16,6 @@ PHP_METHOD (study_coroutine_util, create) {
     //zend_fcall_info就是用来接收我们创建协程的时候传递的那个函数。我们使用
     zend_fcall_info fci = empty_fcall_info;
     zend_fcall_info_cache fcc = empty_fcall_info_cache;
-    zval result;
     //ZEND_PARSE_PARAMETERS_START(1, -1)的-1代表没有限制传递给Study\Coroutine::create接口函数的最大参数个数限制，也就是可变参数
     ZEND_PARSE_PARAMETERS_START(1, -1)
             Z_PARAM_FUNC(fci, fcc)
@@ -148,5 +147,7 @@ void study_coroutine_util_init() {
     PHPCoroutine::init();
     INIT_NS_CLASS_ENTRY(study_coroutine_ce, "Study", "Coroutine", study_coroutine_util_methods);
     study_coroutine_ce_ptr = zend_register_internal_class(&study_coroutine_ce
-                                                          TSRMLS_CC); // Registered in the Zend Engine
+                                                          TSRMLS_CC);
+    zend_register_class_alias("SCo", study_coroutine_ce_ptr); // 新增的代码
+    // Registered in the Zend Engine
 }
