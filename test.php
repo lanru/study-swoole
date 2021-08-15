@@ -23,5 +23,4 @@ function task()
     SCo::defer('deferFunc3');
     echo "task coroutine end" . PHP_EOL;
 }
-
-$cid1 = SCo::create('task');
+$cid1 = sgo('task');

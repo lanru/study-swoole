@@ -8,11 +8,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_study_coroutine_create, 0, 0, 1)
                 ZEND_ARG_CALLABLE_INFO(0, func, 0)
 ZEND_END_ARG_INFO()
 
-// 协程接口方法声明
-static PHP_METHOD(study_coroutine_util, create);
+// 协程接口方法声明,采用php方法的写法
+//static PHP_METHOD(study_coroutine_util, create);
 
-PHP_METHOD (study_coroutine_util, create) {
-
+// 从PHP_METHOD变成PHP_FUNCTION，从php方法变成了php函数,php方法采用ZEND_METHOD(classname, name)方式命名，php函数不用类名。
+PHP_FUNCTION (study_coroutine_create) {
     //zend_fcall_info就是用来接收我们创建协程的时候传递的那个函数。我们使用
     zend_fcall_info fci = empty_fcall_info;
     zend_fcall_info_cache fcc = empty_fcall_info_cache;
@@ -130,7 +130,11 @@ PHP_METHOD(study_coroutine_util, defer)
  */
 const zend_function_entry study_coroutine_util_methods[] =
         {
-                PHP_ME(study_coroutine_util, create, arginfo_study_coroutine_create, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+//       原先php方法的写法,https://php-extension-research.github.io/study/#/协程基础模块/协程短名（二）中删除
+//                PHP_ME(study_coroutine_util, create, arginfo_study_coroutine_create, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+
+//      https://php-extension-research.github.io/study/#/协程基础模块/协程短名（二）
+                ZEND_FENTRY(create, ZEND_FN(study_coroutine_create), arginfo_study_coroutine_create, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
                 PHP_ME(study_coroutine_util, yield, arginfo_study_coroutine_void, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
                 PHP_ME(study_coroutine_util, resume, arginfo_study_coroutine_resume, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
                 PHP_ME(study_coroutine_util, getCid, arginfo_study_coroutine_void, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
