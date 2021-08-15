@@ -1,4 +1,15 @@
 <?php
 
-$cid = Study\Coroutine::getCid();
-echo "coroutine [{$cid}] create" . PHP_EOL;
+function deferFunc()
+{
+    echo "in defer method" . PHP_EOL;
+}
+
+function task()
+{
+    echo "task coroutine start" . PHP_EOL;
+    Study\Coroutine::defer('deferFunc');
+    echo "task coroutine end" . PHP_EOL;
+}
+
+$cid1 = Study\Coroutine::create('task');
