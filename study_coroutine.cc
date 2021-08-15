@@ -238,3 +238,10 @@ int PHPCoroutine::sleep(double seconds)
     std::cout << seconds << endl;
     return 0;
 }
+
+int PHPCoroutine::scheduler()
+{
+    while (1)
+    {
+    }
+}

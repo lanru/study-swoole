@@ -32,17 +32,19 @@ namespace Study {
     class PHPCoroutine {
     public:
         static void init();
+
         static int sleep(double seconds);
 
         static long create(zend_fcall_info_cache *fci_cache, uint32_t argc, zval *argv);
 
         static void defer(php_study_fci_fcc *defer_fci_fcc);
 
-        static inline php_coro_task* get_origin_task(php_coro_task *task)
-        {
+        static inline php_coro_task *get_origin_task(php_coro_task *task) {
             Coroutine *co = task->co->get_origin();
             return co ? (php_coro_task *) co->get_task() : &main_task;
         }
+
+        static int scheduler();
 
     protected:
         static void save_task(php_coro_task *task);
