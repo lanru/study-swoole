@@ -3,6 +3,7 @@
 //
 
 #include "../include/socket.h"
+#include "../include/log.h"
 
 int stSocket_create(int type) {
     int _domain;
@@ -41,14 +42,24 @@ int stSocket_bind(int sock, int type, char *host, int port) {
     return ret;
 }
 
-int stSocket_accept(int sock)
-{
+int stSocket_accept(int sock) {
     int connfd;
     struct sockaddr_in sa;
     socklen_t len;
 
     len = sizeof(sa);
-    connfd = accept(sock, (struct sockaddr *)&sa, &len);
+    connfd = accept(sock, (struct sockaddr *) &sa, &len);
 
     return connfd;
 }
+
+int stSocket_listen(int sock) {
+    int ret;
+
+    ret = listen(sock, 512);
+    if (ret < 0) {
+        stWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+    }
+    return ret;
+}
+
