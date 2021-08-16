@@ -20,5 +20,7 @@ int stSocket_accept(int sock);
 
 int stSocket_listen(int sock);
 
+ssize_t stSocket_recv(int sock, void *buf, size_t len, int flag);
+
 
 #endif //PHP_7_4_15_SOCKET_H
