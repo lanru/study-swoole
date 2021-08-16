@@ -4,7 +4,7 @@
 #include "php.h"
 #include "php_ini.h"
 #include "ext/standard/info.h"
-
+#include "./include/error.h"
 #include "study.h"
 
 #define PHP_STUDY_VERSION "0.1.0"
