@@ -2,8 +2,8 @@
 // Created by wlh on 2021/8/16.
 //
 #include "study_server_coro.h"
-#include "./include/socket.h"
 
+using study::coroutine::Socket;
 /**
  * Define zend class entry
  */
@@ -17,22 +17,24 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_study_coroutine_server_coro_construct,
 
 ZEND_END_ARG_INFO()
 
-PHP_METHOD (study_coroutine_server_coro, __construct
-) {
-    int sock;
+PHP_METHOD (study_coroutine_server_coro, __construct) {
     zval *zhost;
     zend_long zport;
+    zval zsock;
 
     ZEND_PARSE_PARAMETERS_START(2, 2)
             Z_PARAM_ZVAL(zhost)
             Z_PARAM_LONG(zport)
     ZEND_PARSE_PARAMETERS_END_EX(RETURN_FALSE);
 
-    sock = stSocket_create(AF_INET, SOCK_STREAM, 0);
-    stSocket_bind(sock, ST_SOCK_TCP, Z_STRVAL_P(zhost), zport);
-    stSocket_listen(sock); // 修改的地方1
+    Socket *sock = new Socket(AF_INET, SOCK_STREAM, 0);
 
-    zend_update_property_long(study_coroutine_server_coro_ce_ptr, getThis(), ZEND_STRL("sock"), sock);
+    sock->bind(ST_SOCK_TCP, Z_STRVAL_P(zhost), zport);
+    sock->listen();
+
+    ZVAL_PTR(&zsock, sock);
+
+    zend_update_property(study_coroutine_server_coro_ce_ptr, getThis(), ZEND_STRL("zsock"), &zsock);
     zend_update_property_string(study_coroutine_server_coro_ce_ptr, getThis(), ZEND_STRL("host"), Z_STRVAL_P(zhost));
     zend_update_property_long(study_coroutine_server_coro_ce_ptr, getThis(), ZEND_STRL("port"), zport);
 }
@@ -42,10 +44,12 @@ ZEND_END_ARG_INFO()
 
 PHP_METHOD (study_coroutine_server_coro, accept) {
     zval *zsock;
+    Socket *sock; // 新增的一行
     int connfd;
 
-    zsock = st_zend_read_property(study_coroutine_server_coro_ce_ptr, getThis(), ZEND_STRL("sock"), 0);
-    connfd = stSocket_accept(Z_LVAL_P(zsock));
+    zsock = st_zend_read_property(study_coroutine_server_coro_ce_ptr, getThis(), ZEND_STRL("zsock"), 0); // 修改的一行
+    sock = (Socket *) Z_PTR_P(zsock); // 修改的一行
+    connfd = sock->accept(); // 修改的一行
     RETURN_LONG(connfd);
 }
 
@@ -126,7 +130,8 @@ void study_coroutine_server_coro_init() {
     study_coroutine_server_coro_ce_ptr = zend_register_internal_class(&study_coroutine_server_coro_ce
                                                                       TSRMLS_CC); // Registered in the Zend Engine
 
-    zend_declare_property_long(study_coroutine_server_coro_ce_ptr, ZEND_STRL("sock"), -1, ZEND_ACC_PUBLIC);
+    zval *zsock = (zval *) malloc(sizeof(zval));
+    zend_declare_property(study_coroutine_server_coro_ce_ptr, ZEND_STRL("zsock"), zsock, ZEND_ACC_PUBLIC);
     zend_declare_property_string(study_coroutine_server_coro_ce_ptr, ZEND_STRL("host"), "", ZEND_ACC_PUBLIC);
     zend_declare_property_long(study_coroutine_server_coro_ce_ptr, ZEND_STRL("port"), -1, ZEND_ACC_PUBLIC);
     // 省略了其他的代码

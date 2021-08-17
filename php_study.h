@@ -6,6 +6,7 @@
 #include "ext/standard/info.h"
 #include "./include/error.h"
 #include "study.h"
+#include "coroutine_socket.h"
 
 #define PHP_STUDY_VERSION "0.1.0"
 

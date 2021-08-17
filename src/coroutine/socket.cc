@@ -47,6 +47,9 @@ bool Socket::wait_event(int event) {
     id = co->get_cid();
 
     // 用来判断这个协程需要等待那种类型的事件，目前是支持READ和WRITE
+    if (!StudyG.poll) {
+        init_stPoll();
+    }
     ev = StudyG.poll->events;
 
     ev->events = event == ST_EVENT_READ ? EPOLLIN : EPOLLOUT;
@@ -78,6 +81,9 @@ ssize_t Socket::send(const void *buf, size_t len) {
         ret = stSocket_send(sockfd, buf, len, 0);
     }
     return ret;
+}
+
+Socket::~Socket() {
 }
 
 
