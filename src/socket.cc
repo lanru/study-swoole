@@ -68,7 +68,7 @@ ssize_t stSocket_recv(int sock, void *buf, size_t len, int flag) {
     return ret;
 }
 
-ssize_t stSocket_send(int sock, void *buf, size_t len, int flag) {
+ssize_t stSocket_send(int sock, const void *buf, size_t len, int flag) {
     ssize_t ret;
 
     ret = send(sock, buf, len, flag);
@@ -93,4 +93,14 @@ int stSocket_set_nonblock(int sock) {
         return -1;
     }
     return 0;
+}
+
+int stSocket_close(int fd) {
+    int ret;
+
+    ret = close(fd);
+    if (ret < 0) {
+        stWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+    }
+    return ret;
 }
