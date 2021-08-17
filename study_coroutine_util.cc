@@ -1,7 +1,7 @@
 #include "study_coroutine.h"
 #include <unordered_map>
-using Study::PHPCoroutine;
-using Study::Coroutine;
+using study::PHPCoroutine;
+using study::Coroutine;
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_study_coroutine_create, 0, 0, 1)
                 ZEND_ARG_CALLABLE_INFO(0, func, 0)

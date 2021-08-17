@@ -1,6 +1,6 @@
 #include "../../include/context.h"
 #include <iostream>
-using namespace Study;
+using namespace study;
 using namespace std;
 
 Context::Context(size_t stack_size, coroutine_func_t fn, void *private_data) :

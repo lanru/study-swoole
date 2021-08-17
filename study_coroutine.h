@@ -24,11 +24,11 @@ struct php_coro_task {
     zend_vm_stack vm_stack; // 协程栈指针
     size_t vm_stack_page_size;//协程栈页大小
     zend_execute_data *execute_data; // 当前协程栈的栈帧
-    Study::Coroutine *co;
+    study::Coroutine *co;
     std::stack<php_study_fci_fcc *> *defer_tasks;
 };
 
-namespace Study {
+namespace study {
     class PHPCoroutine {
     public:
         static void init();

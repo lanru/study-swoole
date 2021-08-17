@@ -5,22 +5,17 @@
 #include "../include/socket.h"
 #include "../include/log.h"
 
-int stSocket_create(int type) {
-    int _domain;
-    int _type;
+int stSocket_create(int domain, int type, int protocol) {
+    int sock;
 
-    if (type == ST_SOCK_TCP) {
-        _domain = AF_INET;
-        _type = SOCK_STREAM;
-    } else if (type == ST_SOCK_UDP) {
-        _domain = AF_INET;
-        _type = SOCK_DGRAM;
-    } else {
-        return -1;
+    sock = socket(domain, type, protocol);
+    if (sock < 0) {
+        stWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
     }
 
-    return socket(_domain, _type, 0);
+    return sock;
 }
+
 
 int stSocket_bind(int sock, int type, char *host, int port) {
     int ret;
@@ -84,3 +79,18 @@ ssize_t stSocket_send(int sock, void *buf, size_t len, int flag) {
 }
 
 
+int stSocket_set_nonblock(int sock) {
+    int flags;
+
+    flags = fcntl(sock, F_GETFL, 0);
+    if (flags < 0) {
+        stWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+        return -1;
+    }
+    flags = fcntl(sock, F_SETFL, flags | O_NONBLOCK);
+    if (flags < 0) {
+        stWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+        return -1;
+    }
+    return 0;
+}

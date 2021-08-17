@@ -27,9 +27,9 @@ function task()
 $type = $argv[1];
 
 if ($type==1){
-//方式1,类用全名的方式调用 study_coroutine_util_init方法中INIT_NS_CLASS_ENTRY(study_coroutine_ce, "Study", "Coroutine", study_coroutine_util_methods);
+//方式1,类用全名的方式调用 study_coroutine_util_init方法中INIT_NS_CLASS_ENTRY(study_coroutine_ce, "study", "Coroutine", study_coroutine_util_methods);
 echo $type.PHP_EOL;
-$cid1 = Study\Coroutine::create('task');
+$cid1 = study\Coroutine::create('task');
 }elseif($type==2){
 echo $type.PHP_EOL;
 //方式2,类用别名的方式调用,study_coroutine_util_init中zend_register_class_alias("SCo", study_coroutine_ce_ptr); // 新增的代码

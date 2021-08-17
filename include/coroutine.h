@@ -9,7 +9,7 @@
 
 typedef void (*st_coro_on_swap_t)(void *);
 
-namespace Study
+namespace study
 {
     class Coroutine
     {

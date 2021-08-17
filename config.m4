@@ -125,7 +125,8 @@ if test "$PHP_STUDY" != "no"; then
         src/socket.cc \
         src/log.cc \
         src/error.cc \
-        src/core/base.cc
+        src/core/base.cc \
+        src/coroutine/socket.cc
     "
      AC_DEFINE(SW_USE_ASM_CONTEXT, 1, [use boost asm context])
  dnl 这段是声明这个扩展的名称、需要的源文件名、此扩展的编译形式。其中$ext_shared代表此扩展是动态库，使用cxx的原因是，我们的这个扩展使用C++来编写
