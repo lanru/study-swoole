@@ -1,17 +1,16 @@
 <?php
 
-$serv = new Study\Coroutine\Server("127.0.0.1", 8080);
-
-$sock = $serv->accept();
-
-while (1)
+Sgo(function ()
 {
-    $buf = $serv->recv($sock);
-    if ($buf == false)
-    {
-        var_dump($serv->errCode);
-        var_dump($serv->errMsg);
-        break;
-    }
-    $serv->send($sock, $buf);
-}
+    var_dump("here1");
+    Sco::sleep(0.5);
+    var_dump("here2");
+    Sco::sleep(1);
+    var_dump("here3");
+    Sco::sleep(1.5);
+    var_dump("here4");
+    Sco::sleep(2);
+    var_dump("here5");
+});
+
+Sco::scheduler();

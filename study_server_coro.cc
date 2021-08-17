@@ -30,7 +30,7 @@ PHP_METHOD (study_coroutine_server_coro, __construct
 
     sock = stSocket_create(ST_SOCK_TCP);
     stSocket_bind(sock, ST_SOCK_TCP, Z_STRVAL_P(zhost), zport);
-    stSocket_listen(sock); // 修改的地方
+    stSocket_listen(sock); // 修改的地方1
 
     zend_update_property_long(study_coroutine_server_coro_ce_ptr, getThis(), ZEND_STRL("sock"), sock);
     zend_update_property_string(study_coroutine_server_coro_ce_ptr, getThis(), ZEND_STRL("host"), Z_STRVAL_P(zhost));
