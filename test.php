@@ -1,9 +1,22 @@
 <?php
 
-Sgo(function ()
-{
-    $serv = new Study\Coroutine\Server("127.0.0.1", 8080);
-    $connfd = $serv->accept();
-    var_dump($connfd);
+study_event_init();
+
+Sgo(function () {
+    var_dump(Sco::getCid());
+    Sco::sleep(1);
+    var_dump(Sco::getCid());
 });
-Sco::scheduler();
+
+Sgo(function () {
+    var_dump(Sco::getCid());
+    Sco::sleep(1);
+    var_dump(Sco::getCid());
+});
+
+Sgo(function () {
+    var_dump(Sco::getCid());
+    Sco::sleep(1);
+    var_dump(Sco::getCid());
+});
+study_event_wait();

@@ -5,9 +5,15 @@
 #include "coroutine_socket.h"
 #include "coroutine.h" // 增加的一行
 #include "socket.h"
+#include "log.h"
 
 using study::coroutine::Socket;
 using study::Coroutine;
+
+char *Socket::read_buffer = nullptr; // 增加的地方
+size_t Socket::read_buffer_len = 0; // 增加的地方
+char *Socket::write_buffer = nullptr; // 增加的地方
+size_t Socket::write_buffer_len = 0; // 增加的地方
 
 Socket::Socket(int domain, int type, int protocol) {
     sockfd = stSocket_create(domain, type, protocol);
@@ -28,15 +34,13 @@ int Socket::listen() {
 int Socket::accept() {
     int connfd;
 
-    connfd = stSocket_accept(sockfd);
-    // 尝试获取客户端连接，如果返回值connfd小于0，并且errno == EAGAIN,那么就说明此时没有客户端连接，我们就需要等待事件（此时的事件是有客户端的连接，这是一个可读的事件）的到来，并且yield这个协程。我们把这个等待和yield的操作封装在了函数wait_event里面
-    if (connfd < 0 && errno == EAGAIN) {
-        wait_event(ST_EVENT_READ);
+    do {
         connfd = stSocket_accept(sockfd);
-    }
+    } while (connfd < 0 && errno == EAGAIN && wait_event(ST_EVENT_READ));
 
     return connfd;
 }
+
 
 bool Socket::wait_event(int event) {
     long id;
@@ -56,34 +60,68 @@ bool Socket::wait_event(int event) {
     ev->data.u64 = touint64(sockfd, id);
     // 用来把事件注册到全局的epollfd上面
     epoll_ctl(StudyG.poll->epollfd, EPOLL_CTL_ADD, sockfd, ev);
-
+    (StudyG.poll->event_num)++; // 新增的一行
     co->yield();
+    // 以下是增加的代码
+    if (epoll_ctl(StudyG.poll->epollfd, EPOLL_CTL_DEL, sockfd, NULL) < 0) {
+        stWarn("Error has occurred: (errno %d) %s", errno, strerror(errno));
+        return false;
+    }
     return true;
 }
 
 ssize_t Socket::recv(void *buf, size_t len) {
     int ret;
 
-    ret = stSocket_recv(sockfd, buf, len, 0);
-    if (ret < 0 && errno == EAGAIN) {
-        wait_event(ST_EVENT_READ);
+    do {
         ret = stSocket_recv(sockfd, buf, len, 0);
-    }
+    } while (ret < 0 && errno == EAGAIN && wait_event(ST_EVENT_READ));
+
     return ret;
 }
 
 ssize_t Socket::send(const void *buf, size_t len) {
     int ret;
 
-    ret = stSocket_send(sockfd, buf, len, 0);
-    if (ret < 0 && errno == EAGAIN) {
-        wait_event(ST_EVENT_WRITE);
+    do {
         ret = stSocket_send(sockfd, buf, len, 0);
-    }
+    } while (ret < 0 && errno == EAGAIN && wait_event(ST_EVENT_WRITE));
+
     return ret;
 }
 
 Socket::~Socket() {
+}
+
+int Socket::init_read_buffer() {
+    if (!read_buffer) {
+        try {
+            read_buffer = new char[65536];
+        }
+        catch (const std::bad_alloc &e) {
+            stError("%s", e.what());
+        }
+
+        read_buffer_len = 65536;
+    }
+
+    return 0;
+}
+
+
+int Socket::init_write_buffer() {
+    if (!write_buffer) {
+        try {
+            write_buffer = new char[65536];
+        }
+        catch (const std::bad_alloc &e) {
+            stError("%s", e.what());
+        }
+
+        write_buffer_len = 65536;
+    }
+
+    return 0;
 }
 
 

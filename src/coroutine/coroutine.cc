@@ -1,4 +1,5 @@
-#include "../../include/coroutine.h"
+#include "coroutine.h"
+#include "timer.h"
 
 using study::Coroutine;
 
@@ -64,21 +65,15 @@ void Coroutine::set_on_close(st_coro_on_swap_t func) {
     on_close = func;
 }
 
-static void sleep_timeout(uv_timer_t *timer) {
-    //这个函数的作用就是去resume当前协程，于是就起到了唤醒当前协程的效果
-    ((Coroutine *) timer->data)->resume();
+static void sleep_timeout(void *param) {
+    ((Coroutine *) param)->resume();
 }
 
 int Coroutine::sleep(double seconds) {
     Coroutine *co = Coroutine::get_current();
 
-    uv_timer_t timer;
-    timer.data = co;
-    //用来初始化我们的定时器节点uv_timer_init的位置是mac或者linxu中的/usr/local/include/uv.h
-    uv_timer_init(uv_default_loop(), &timer);
-    //用来把这个定时器节点插入到整个定时器堆里面。这里，我们需要明确一点，libuv的这个定时器堆是一个最小堆，也就是说，堆顶的定时器节点的timeout越小。uv_timer_start函数里面会把定时器节点timer插入到整个定时器堆里面，并且会根据timer的timeout调整timer在定时器堆里面的位置
-    uv_timer_start(&timer, sleep_timeout, seconds * 1000, 0);
-    //用来切换出当前协程，模拟出了协程自身阻塞的效果
+    timer_manager.add_timer(seconds * Timer::SECOND, sleep_timeout, (void *) co);
+
     co->yield();
     return 0;
 }

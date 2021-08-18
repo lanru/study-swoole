@@ -40,14 +40,17 @@
 #include <sys/utsname.h>
 #include <sys/stat.h>
 #include <sys/epoll.h>
+#include <queue>
 
 typedef struct {
     int epollfd; // 用来保存我们创建的那个epollfd
     int ncap;
+    int event_num; // 新增加的一行
     struct epoll_event *events; //是用来保存epoll返回的事件
 } stPoll_t;
 
 typedef struct {
+    int running; // 新增加的一行
     stPoll_t *poll;
 } stGlobal_t;
 //为什么我们不直接在文件study.h里面定义全局变量StudyG呢？因为，如果我们在文件study.h里面定义了这个全局的变量，那么，如果头文件study.h被多个地方引入了，那么，编译器就会认为这个全局变量重复定义了，所以，我们需要在一个地方去定义它，然后在另一个地方声明这是一个外部变量
@@ -70,27 +73,21 @@ static inline uint64_t touint64(int fd, int id) {
     return ret;
 }
 
-static inline void init_stPoll() {
-    size_t size;
-
-    StudyG.poll = (stPoll_t *) malloc(sizeof(stPoll_t));
-
-    StudyG.poll->epollfd = epoll_create(256);
-    StudyG.poll->ncap = 16;
-    size = sizeof(struct epoll_event) * StudyG.poll->ncap;
-    StudyG.poll->events = (struct epoll_event *) malloc(size);
-    memset(StudyG.poll->events, 0, size);
-}
 
 static inline void fromuint64(uint64_t v, int *fd, int *id) {
     *fd = (int) (v >> 32);
     *id = (int) (v & 0xffffffff);
 }
 
-static inline void free_stPoll() {
-    free(StudyG.poll->events);
-    free(StudyG.poll);
-}
+int init_stPoll();
+
+int free_stPoll();
+
+int st_event_init();
+
+int st_event_wait();
+
+int st_event_free();
 
 
 #endif /* STUDY_H_ */

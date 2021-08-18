@@ -9,6 +9,13 @@ namespace study {
         private:
             int sockfd;
         public:
+            static char *read_buffer;
+            static size_t read_buffer_len;
+
+            static char *write_buffer;
+            static size_t write_buffer_len;
+            static int init_read_buffer();
+            static int init_write_buffer();
             Socket(int domain, int type, int protocol);
 
             Socket(int fd);
