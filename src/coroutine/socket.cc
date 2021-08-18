@@ -90,6 +90,11 @@ ssize_t Socket::send(const void *buf, size_t len) {
     return ret;
 }
 
+Socket::Socket(int fd) {
+    sockfd = fd;
+    stSocket_set_nonblock(sockfd);
+}
+
 Socket::~Socket() {
 }
 
