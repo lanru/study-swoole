@@ -1,6 +1,6 @@
 #include "../../include/coroutine.h"
 #include "../../include/timer.h"
-
+#include "log.h"
 using study::Coroutine;
 
 Coroutine *Coroutine::current = nullptr;
@@ -28,7 +28,13 @@ void Coroutine::set_task(void *_task) {
 }
 
 long Coroutine::create(coroutine_func_t fn, void *args) {
-    return (new Coroutine(fn, args))->run();
+    try {
+        return (new Coroutine(fn, args))->run();
+    }
+    catch (const std::bad_alloc &e) {
+        stError("%s", e.what());
+    }
+
 }
 
 void Coroutine::yield() {

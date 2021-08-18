@@ -130,5 +130,7 @@ int Socket::init_write_buffer() {
 }
 
 
-
+int Socket::close() {
+    return stSocket_close(sockfd);
+}
 

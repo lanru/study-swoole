@@ -44,8 +44,6 @@ namespace study {
             return co ? (php_coro_task *) co->get_task() : &main_task;
         }
 
-        static int scheduler();
-
     protected:
         static void save_task(php_coro_task *task);
 
