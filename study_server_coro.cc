@@ -149,16 +149,16 @@ static const zend_function_entry study_coroutine_server_coro_methods[] =
 
 
 void study_coroutine_server_coro_init() {
+    zval zsock; // 修改的地方
+
     INIT_NS_CLASS_ENTRY(study_coroutine_server_coro_ce, "Study", "Coroutine\\Server",
                         study_coroutine_server_coro_methods);
     study_coroutine_server_coro_ce_ptr = zend_register_internal_class(&study_coroutine_server_coro_ce
                                                                       TSRMLS_CC); // Registered in the Zend Engine
 
-    zval *zsock = (zval *) malloc(sizeof(zval));
-    zend_declare_property(study_coroutine_server_coro_ce_ptr, ZEND_STRL("zsock"), zsock, ZEND_ACC_PUBLIC);
+    zend_declare_property(study_coroutine_server_coro_ce_ptr, ZEND_STRL("zsock"), &zsock, ZEND_ACC_PUBLIC); // 修改的地方
     zend_declare_property_string(study_coroutine_server_coro_ce_ptr, ZEND_STRL("host"), "", ZEND_ACC_PUBLIC);
     zend_declare_property_long(study_coroutine_server_coro_ce_ptr, ZEND_STRL("port"), -1, ZEND_ACC_PUBLIC);
-    // 省略了其他的代码
     zend_declare_property_long(study_coroutine_server_coro_ce_ptr, ZEND_STRL("errCode"), 0, ZEND_ACC_PUBLIC);
     zend_declare_property_string(study_coroutine_server_coro_ce_ptr, ZEND_STRL("errMsg"), "", ZEND_ACC_PUBLIC);
 }

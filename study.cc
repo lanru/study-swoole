@@ -27,6 +27,8 @@ PHP_MINIT_FUNCTION (study) {
     study_coroutine_util_init();
     // server注册
     study_coroutine_server_coro_init(); // 新增加的代码
+    // chanel注册
+    study_coro_channel_init();
     return SUCCESS;
 }
 
