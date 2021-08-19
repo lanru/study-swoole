@@ -25,8 +25,8 @@ PHP_FUNCTION (study_timer_test) {
 PHP_MINIT_FUNCTION (study) {
     // 协程类注册
     study_coroutine_util_init();
-    // server注册
-    study_coroutine_server_coro_init(); // 新增加的代码
+//    // server注册
+//    study_coroutine_server_coro_init(); // 新增加的代码
     // chanel注册
     study_coro_channel_init();
     return SUCCESS;

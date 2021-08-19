@@ -1,10 +1,7 @@
-//
-// Created by wlh on 2021/8/19.
-//
-
-#ifndef PHP_7_4_15_STUDY_COROUTINE_CHANNEL_H
-#define PHP_7_4_15_STUDY_COROUTINE_CHANNEL_H
+#ifndef STUDY_COROUTINE_CHANNEL_H
+#define STUDY_COROUTINE_CHANNEL_H
 
 #include "php_study.h"
+#include "coroutine_channel.h"
 
-#endif //PHP_7_4_15_STUDY_COROUTINE_CHANNEL_H
+#endif	/* STUDY_COROUTINE_CHANNEL_H */
